@@ -11,6 +11,10 @@ class Overlay {
         this.title = document.createElement("h1");
         target_elem.appendChild(this.title);
         
+        // create subtitle
+        this.subtitle = document.createElement("p");
+        target_elem.appendChild(this.subtitle);
+        
         // create new div (to hold graph) and append to target
         var graph_holder = document.createElement("div");
         graph_holder.setAttribute("class", "graph");
@@ -96,12 +100,24 @@ info.update = function(props) {
 
 info.addTo(map);
 
-function highlightFeature(e) {
+function highlightFeature(e) {  
     var layer = e.target;
+    
+    // Enhance outline on hover
+    layer.setStyle({
+        weight: 5,
+        color: '#666',
+        dashArray: '',
+        fillOpacity: 0.7
+    });
+    
     info.update(layer.feature.properties);
 }
 
 function resetHighlight(e) {
+    // Undo outline effect
+    geojson.resetStyle(e.target);
+    
     var layer = e.target;
     info.update();
 }
@@ -113,19 +129,22 @@ function moreInfo(e) {
             columns: [
                 [
                     'Total',
-                    props.HD01_VD02,
-                    props.HD01_VD03,
-                    props.HD01_VD04,
-                    props.HD01_VD05,
-                    props.HD01_VD06,
-                    props.HD01_VD07,
-                    props.HD01_VD08,
-                    props.HD01_VD09,
-                    props.HD01_VD10,
-                    props.HD01_VD11,
-                    props.HD01_VD12,
-                    props.HD01_VD13
+                    props.HC01_EST_VC46, props.HC01_EST_VC47, props.HC01_EST_VC48,
+                    props.HC01_EST_VC49, props.HC01_EST_VC50, props.HC01_EST_VC51,
+                    props.HC01_EST_VC52, props.HC01_EST_VC53, props.HC01_EST_VC54
+                ], 
+                [
+                    'Male',
+                    props.HC02_EST_VC46, props.HC02_EST_VC47, props.HC02_EST_VC48,
+                    props.HC02_EST_VC49, props.HC02_EST_VC50, props.HC02_EST_VC51,
+                    props.HC02_EST_VC52, props.HC02_EST_VC53, props.HC02_EST_VC54
                 ],
+                [
+                    'Female',
+                    props.HC03_EST_VC46, props.HC03_EST_VC47, props.HC03_EST_VC48,
+                    props.HC03_EST_VC49, props.HC03_EST_VC50, props.HC03_EST_VC51,
+                    props.HC03_EST_VC52, props.HC03_EST_VC53, props.HC03_EST_VC54
+                ]
             ],
             type: 'bar'
         },
@@ -133,18 +152,15 @@ function moreInfo(e) {
           x: {
             type: 'category',
             categories: [
-                'Less than 5 minutes',
-                '5 to 9 minutes',
+                'Less than 10 minutes',
                 '10 to 14 minutes',
                 '15 to 19 minutes',
                 '20 to 24 minutes',
                 '25 to 29 minutes',
                 '30 to 34 minutes',
-                '35 to 39 minutes',
-                '40 to 44 minutes',
+                '35 to 44 minutes',
                 '45 to 59 minutes',
-                '60 to 89 minutes',
-                '90 or more minutes'
+                '60 or more minutes'
             ]
           }
         },
@@ -157,7 +173,8 @@ function moreInfo(e) {
         }
     };
     
-    overlay_manager.title.innerHTML = props.NAME + " County";
+    overlay_manager.title.innerHTML = props.NAME + " County" + ", " + props.STATE_NAME;
+    overlay_manager.subtitle.innerHTML = "Mean Commute Time: " + props.HC01_EST_VC55 + " minutes (Males: " + props.HC02_EST_VC55 + ", Females: " + props.HC03_EST_VC55 + ")";
     overlay_manager.generate(params);
 }
 
