@@ -8,7 +8,12 @@ WITH _features AS (
 )
 SELECT
     F.features || jsonb_build_object('properties', F.features->'properties' || jsonb_build_object(
+        /* Mean Travel Time */
         'HC01_EST_VC55',D1."HC01_EST_VC55",
+        'HC01_EST_VC55_RANK', rank() OVER (ORDER BY D1."HC01_EST_VC55" ASC),
+        'HC01_EST_VC55_STATE_RANK', rank() OVER (PARTITION BY S."STATE" ORDER BY D1."HC01_EST_VC55" ASC),
+        
+        /* Travel Time Categories */
         'HC01_EST_VC46',D1."HC01_EST_VC46",
         'HC02_EST_VC46',D1."HC02_EST_VC46",
         'HC03_EST_VC46',D1."HC03_EST_VC46",
@@ -39,6 +44,16 @@ SELECT
         'HC01_EST_VC55',D1."HC01_EST_VC55",
         'HC02_EST_VC55',D1."HC02_EST_VC55",
         'HC03_EST_VC55',D1."HC03_EST_VC55",
+        
+        /* Mode of Transport */
+        'HC01_EST_VC03',D1."HC01_EST_VC03",
+        'HC01_EST_VC10',D1."HC01_EST_VC10",
+        'HC01_EST_VC11',D1."HC01_EST_VC11",
+        'HC01_EST_VC12',D1."HC01_EST_VC12",
+        'HC01_EST_VC13',D1."HC01_EST_VC13",
+        'HC01_EST_VC14',D1."HC01_EST_VC14", /* Work at home */
+        
+        /* State Name */
         'STATE_NAME',S."STATE_NAME"
     )) AS features
 FROM
