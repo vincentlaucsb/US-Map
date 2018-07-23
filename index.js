@@ -155,10 +155,7 @@ var layer_manager = {
     style: function(feature) {
         return {
             fillColor: layer_manager.getColor(feature.properties[map_state.current_var]),
-            weight: 1,
-            opacity: 1,
-            color: 'white',
-            dashArray: '3',
+            weight: 0, // stroke width
             fillOpacity: 0.7
         }
     },
@@ -260,8 +257,9 @@ function moreInfo(e) {
     
     overlay_manager.title.innerHTML = props.NAME + " County" + ", " + props.STATE_NAME;
     overlay_manager.subtitle.innerHTML = "Mean Commute Time: " + props.HC01_EST_VC55 + " minutes (Males: " + props.HC02_EST_VC55 + ", Females: " + props.HC03_EST_VC55 + ")" +
-    "<br /><span>Rank (best to worst): " + props.HC01_EST_VC55_RANK + " out of " + counties.features.length + " (USA); " + props.HC01_EST_VC55_STATE_RANK +"th best in " + 
-    props.STATE_NAME + "</span>";
+    "<br /><span>Rank (best to worst): " + 
+    ordinal(props.HC01_EST_VC55_STATE_RANK) + " in " + props.STATE_NAME + ", " +
+    ordinal(props.HC01_EST_VC55_RANK) + " in America (out of " + counties.features.length + ")</span>";
     overlay_manager.generate(params);
 }
 

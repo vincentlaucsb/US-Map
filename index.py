@@ -68,13 +68,17 @@ with psycopg2.connect(
     percentiles = load_query('percentiles.sql')
     
     cur.execute(query)
-    data = json.dumps(cur.fetchone()[0])
+    counties_data = json.dumps(cur.fetchone()[0])
     
     # Calculate 20th, 40th, ..., 80th percentile for each variable
     percentiles_json = {}
     for col in vars.keys():
         cur.execute(percentiles.format(col=col))
         percentiles_json[col] = cur.fetchone()[0]
+        
+    with open('counties.js', 'w') as outfile:
+        outfile.write('var counties = {};'.format(
+            counties_data))
     
     with open('index.html', 'w') as outfile:
         outfile.write('''
@@ -88,9 +92,8 @@ with psycopg2.connect(
                 <link href="js/c3-0.6.5/c3.css" rel="stylesheet">
 
                 <!-- Load d3.js and c3.js -->
-                <script src="https://d3js.org/d3.v5.min.js"></script>
+                <script src="js/d3.v5.min.js"></script>
                 <script src="js/c3-0.6.5/c3.min.js"></script>
-
                 <script src="js/leaflet.js"></script>
                 <link rel="stylesheet" href="index.css" type="text/css" />
             </head>
@@ -98,15 +101,15 @@ with psycopg2.connect(
                 <div id='overlay'></div>
                 <div id='map'></div>
                 <script type="text/javascript">
-                    var meta = {};
-                    var percentiles = {};
-                    var counties = {};
+                    var meta = {meta};
+                    var percentiles = {pct};
                 </script>
+                <script src="counties.js" type="text/javascript"></script>
+                <script src="helpers.js" type="text/javascript"></script>
                 <script src="index.js" type="text/javascript"></script>
             </body>
             </html>'''
             .format(
-                json.dumps(vars),
-                json.dumps(percentiles_json),
-                data
+                meta = json.dumps(vars),
+                pct = json.dumps(percentiles_json)
             ))
