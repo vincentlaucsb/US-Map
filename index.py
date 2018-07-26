@@ -32,6 +32,16 @@ vars = {
         'units': 'percent (of workers)'
     },
     
+    'HC01_EST_VC04': {
+        'display_label': 'Drove to work (alone)',
+        'units': 'percent (of workers)'
+    },
+    
+    'HC01_EST_VC05': {
+        'display_label': 'Drove to work (carpool)',
+        'units': 'percent (of workers)'
+    },
+    
     'HC01_EST_VC10': {
         'display_label': 'Took public transportation to work',
         'units': 'percent (of workers)'
@@ -88,6 +98,10 @@ with psycopg2.connect(
                 <meta charset="UTF-8">
                 <title>US Map</title>
                 <link rel="stylesheet" href="js/leaflet.css" />
+                
+                <!-- Load tabs -->
+                <script src="js/vince.js/tabs/tabs.js" type="text/javascript"></script>
+                
                 <!-- Load c3.css -->
                 <link href="js/c3-0.6.5/c3.css" rel="stylesheet">
 
@@ -107,6 +121,10 @@ with psycopg2.connect(
                 <script src="counties.js" type="text/javascript"></script>
                 <script src="helpers.js" type="text/javascript"></script>
                 <script src="index.js" type="text/javascript"></script>
+                <script type='text/javascript'>
+                    <!-- Crucial: This needs to load after index.js -->
+                    var tabs = new Tabber('tabs');
+                </script>
             </body>
             </html>'''
             .format(

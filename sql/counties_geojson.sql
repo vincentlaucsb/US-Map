@@ -47,6 +47,8 @@ SELECT
         
         /* Mode of Transport */
         'HC01_EST_VC03',D1."HC01_EST_VC03",
+        'HC01_EST_VC04',D1."HC01_EST_VC04",
+        'HC01_EST_VC05',D1."HC01_EST_VC05",
         'HC01_EST_VC10',D1."HC01_EST_VC10",
         'HC01_EST_VC11',D1."HC01_EST_VC11",
         'HC01_EST_VC12',D1."HC01_EST_VC12",

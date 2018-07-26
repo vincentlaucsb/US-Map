@@ -2,27 +2,64 @@
 // Overlay //
 /////////////
 
+class GraphContainer {
+    /*
+     * Helper class for Overlay
+     *
+     * Each GraphContainer corresponds to a new tab in the overlay display
+     */
+    
+    constructor(parent, elem, title) {
+        // elem should be an ID name
+        this.target = elem;
+        var new_section = document.createElement("section");
+        new_section.dataset.title = title;
+        new_section.setAttribute("id", elem);
+        
+        // Make subtitle
+        this.subtitle = document.createElement("p");
+        this.subtitle.setAttribute("class", "subtitle");
+        new_section.appendChild(this.subtitle);
+        
+        // Make container for c3 graph
+        var graph_container = document.createElement("div");
+        graph_container.setAttribute("class", "graph");
+        new_section.appendChild(graph_container);
+        
+        parent.appendChild(new_section);
+    }
+    
+    generate(params) {
+        params.bindto = "#" + this.target + " div.graph";
+        c3.generate(params);
+    }
+}
+
 class Overlay {
     // Manages the extra information overlay
     
     constructor (target) {
         // target should be a CSS selector
         this.target = target;
-        
         const target_elem = document.querySelector(target);
         
-        // create header
+        // for tab.js
+        var tab_menu = document.createElement("nav");
+        var tabs = document.createElement("div");
+        tab_menu.setAttribute("id", "tabs-menu");
+        tabs.setAttribute("id", "tabs");
+        
+        // create elements
         this.title = document.createElement("h1");
         target_elem.appendChild(this.title);
+        target_elem.appendChild(tab_menu);
+        target_elem.appendChild(tabs);
         
-        // create subtitle
-        this.subtitle = document.createElement("p");
-        target_elem.appendChild(this.subtitle);
-        
-        // create new div (to hold graph) and append to target
-        var graph_holder = document.createElement("div");
-        graph_holder.setAttribute("class", "graph");
-        target_elem.appendChild(graph_holder);
+        // register graphs
+        this.graphs = {
+            commute: new GraphContainer(tabs, "commute", 'Commute Times'),
+            transport: new GraphContainer(tabs, "transport", 'Mode of Transportation')
+        };
         
         // create close handler
         var close_handler = document.createElement("a");
@@ -31,12 +68,6 @@ class Overlay {
         // addEventListener doesn't work for some reason
         close_handler.setAttribute("onclick", "overlay_manager.hide()");
         target_elem.appendChild(close_handler);
-    }
-    
-    generate(params) {
-        params.bindto = this.target + " div.graph";
-        this.show();
-        c3.generate(params);
     }
     
     hide() {
@@ -114,13 +145,12 @@ var layer_manager = {
     
     make_legend: function(var_name, map) {
         // Create a legend
-        var grades = [
-            0,
-            percentiles[var_name][0.2],
-            percentiles[var_name][0.4],
-            percentiles[var_name][0.6],
-            percentiles[var_name][0.8]
-        ];
+        var grades = [ 0 ];
+        const sorted_pct = Object.keys(percentiles[var_name]).sort();
+        for (var i in sorted_pct) {
+            const pct = sorted_pct[i];
+            grades.push(percentiles[var_name][pct]);
+        }
         
         var legend = L.control({position: 'bottomright'});
         legend.onAdd = function (map) {
@@ -145,11 +175,14 @@ var layer_manager = {
     
     getColor: function(d) {
         const pct = percentiles[map_state.current_var];
-        return d > pct[0.8] ? '#0868ac' :
-               d > pct[0.6] ? '#43a2ca' :
-               d > pct[0.4] ? '#7bccc4' :
-               d > pct[0.2] ? '#bae4bc' :
-                              '#f0f9e8';
+        return d > pct[0.875] ? '#0c2c84' :
+               d > pct[0.75]  ? '#225ea8' :
+               d > pct[0.625] ? '#1d91c0' :
+               d > pct[0.5]   ? '#41b6c4' :
+               d > pct[0.375] ? '#7fcdbb' : 
+               d > pct[0.25]  ? '#c7e9b4' :
+               d > pct[0.125] ? '#edf8b1' :
+                                '#ffffd9' ;
     },
 
     style: function(feature) {
@@ -204,9 +237,11 @@ L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token='
 }).addTo(map);
 
 // popup containing extra information (same for all layers)
-function moreInfo(e) {   
+function moreInfo(e) {
     var props = e.target.feature.properties;
-    var params = {
+    
+    // Commuters
+    var commute_params = {
         data: {
             columns: [
                 [
@@ -255,12 +290,51 @@ function moreInfo(e) {
         }
     };
     
+    // Mode of Transportation
+    var transport_params = {
+        data: {
+            columns: [
+                [
+                    'Total', 
+                    props.HC01_EST_VC03, props.HC01_EST_VC04, props.HC01_EST_VC05,
+                    props.HC01_EST_VC10, props.HC01_EST_VC11, props.HC01_EST_VC12,
+                    props.HC01_EST_VC13, props.HC01_EST_VC14
+                ]
+            ],
+            type: 'bar'
+        },
+        axis: {
+          x: {
+            type: 'category',
+            categories: [
+                'Drove to Work (Total)',
+                'Drove to Work (Alone)',
+                'Drove to Work (Carpool)',
+                'Took Public Transport',
+                'Walked',
+                'Biked',
+                'Cab, Motorcycle, etc.',
+                'Worked at Home'
+            ]
+          }
+        },
+        bar: {
+            width: {
+                ratio: 0.5
+            }
+        }
+    };
+    
     overlay_manager.title.innerHTML = props.NAME + " County" + ", " + props.STATE_NAME;
-    overlay_manager.subtitle.innerHTML = "Mean Commute Time: " + props.HC01_EST_VC55 + " minutes (Males: " + props.HC02_EST_VC55 + ", Females: " + props.HC03_EST_VC55 + ")" +
-    "<br /><span>Rank (best to worst): " + 
-    ordinal(props.HC01_EST_VC55_STATE_RANK) + " in " + props.STATE_NAME + ", " +
-    ordinal(props.HC01_EST_VC55_RANK) + " in America (out of " + counties.features.length + ")</span>";
-    overlay_manager.generate(params);
+    overlay_manager.show();
+    overlay_manager.graphs.commute.generate(commute_params);
+    overlay_manager.graphs.commute.subtitle.innerHTML = "Mean Commute Time: " + props.HC01_EST_VC55 +
+        " minutes (Males: " + props.HC02_EST_VC55 + ", Females: " + props.HC03_EST_VC55 + ")" +
+        "<br /><span>Rank (best to worst): " + 
+        ordinal(props.HC01_EST_VC55_STATE_RANK) + " in " + props.STATE_NAME + ", " +
+        ordinal(props.HC01_EST_VC55_RANK) + " in America (out of " + counties.features.length + ")</span>";
+    
+    overlay_manager.graphs.transport.generate(transport_params);
 }
 
 layer_manager.show('HC01_EST_VC55');
@@ -268,6 +342,7 @@ layer_manager.show('HC01_EST_VC55');
 //////////////
 // Dropdown //
 //////////////
+
 var dropdown = L.control({position: 'bottomleft'});
 dropdown.onAdd = function(map) {
     this._div = L.DomUtil.create('div', 'dropdown');

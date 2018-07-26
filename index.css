@@ -42,3 +42,8 @@ body {
     border-radius: 1em;
     padding: 5vh 5vw 5vh 5vw;
 }
+
+#overlay div.graph {
+    width: 100%;
+    height: 100%;
+}
