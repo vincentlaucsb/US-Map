@@ -1,36 +1,67 @@
 
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <meta charset="UTF-8">
-                <title>US Map</title>
-                <link rel="stylesheet" href="js/leaflet.css" />
-                
-                <!-- Load tabs -->
-                <script src="js/vince.js/tabs/tabs.js" type="text/javascript"></script>
-                
-                <!-- Load c3.css -->
-                <link href="js/c3-0.6.5/c3.css" rel="stylesheet">
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>US Map</title>
+            <link rel="stylesheet" href="js/leaflet.css" />
+            
+            <!-- Load tabs -->
+            <script src="js/vince.js/tabs/tabs.js" type="text/javascript"></script>
+            
+            <!-- Load c3.css -->
+            <link href="js/c3-0.6.5/c3.css" rel="stylesheet">
 
-                <!-- Load d3.js and c3.js -->
-                <script src="js/d3.v5.min.js"></script>
-                <script src="js/c3-0.6.5/c3.min.js"></script>
-                <script src="js/leaflet.js"></script>
-                <link rel="stylesheet" href="index.css" type="text/css" />
-            </head>
-            <body>
-                <div id='overlay'></div>
-                <div id='map'></div>
-                <script type="text/javascript">
-                    var meta = {"HC01_EST_VC55": {"display_label": "Mean Commute Time", "units": "minutes"}, "HC01_EST_VC54": {"display_label": "Extreme Commutes (60+ Minutes)", "units": "percent (of workers)"}, "HC01_EST_VC03": {"display_label": "Drove to work", "units": "percent (of workers)"}, "HC01_EST_VC04": {"display_label": "Drove to work (alone)", "units": "percent (of workers)"}, "HC01_EST_VC05": {"display_label": "Drove to work (carpool)", "units": "percent (of workers)"}, "HC01_EST_VC10": {"display_label": "Took public transportation to work", "units": "percent (of workers)"}, "HC01_EST_VC11": {"display_label": "Walked to work", "units": "percent (of workers)"}, "HC01_EST_VC12": {"display_label": "Biked to work", "units": "percent (of workers)"}, "HC01_EST_VC13": {"display_label": "Took cab, rode motorcycle, etc. to work", "units": "percent (of workers)"}, "HC01_EST_VC14": {"display_label": "Worked at home", "units": "percent (of workers)"}};
-                    var percentiles = {"HC01_EST_VC55": {"0.5": 23, "0.25": 19.5, "0.75": 26.7, "0.125": 17.1, "0.375": 21.2, "0.625": 24.6, "0.875": 29.8375}, "HC01_EST_VC54": {"0.5": 6.5, "0.25": 4.3, "0.75": 9.6, "0.125": 3.3, "0.375": 5.3, "0.625": 7.8, "0.875": 13.1}, "HC01_EST_VC03": {"0.5": 91.3, "0.25": 87.9, "0.75": 93.5, "0.125": 83.8625, "0.375": 89.8, "0.625": 92.5, "0.875": 94.7}, "HC01_EST_VC04": {"0.5": 80.8, "0.25": 76.9, "0.75": 83.8, "0.125": 72.9, "0.375": 79.2, "0.625": 82.3, "0.875": 85.5}, "HC01_EST_VC05": {"0.5": 9.8, "0.25": 8.3, "0.75": 11.6, "0.125": 7.3, "0.375": 9.1, "0.625": 10.5, "0.875": 13.3}, "HC01_EST_VC10": {"0.5": 0.3, "0.25": 0.1, "0.75": 0.8, "0.125": 0, "0.375": 0.2, "0.625": 0.5, "0.875": 1.5}, "HC01_EST_VC11": {"0.5": 2.3, "0.25": 1.4, "0.75": 3.9, "0.125": 0.9, "0.375": 1.8, "0.625": 3, "0.875": 5.5}, "HC01_EST_VC12": {"0.5": 0.2, "0.25": 0, "0.75": 0.4, "0.125": 0, "0.375": 0.1, "0.625": 0.3, "0.875": 0.7}, "HC01_EST_VC13": {"0.5": 1, "0.25": 0.7, "0.75": 1.5, "0.125": 0.5, "0.375": 0.8, "0.625": 1.2, "0.875": 2}, "HC01_EST_VC14": {"0.5": 4.1, "0.25": 2.9, "0.75": 5.7, "0.125": 2.1, "0.375": 3.4, "0.625": 4.8, "0.875": 7.4}};
-                </script>
-                <script src="counties.js" type="text/javascript"></script>
-                <script src="helpers.js" type="text/javascript"></script>
-                <script src="index.js" type="text/javascript"></script>
-                <script type='text/javascript'>
-                    <!-- Crucial: This needs to load after index.js -->
-                    var tabs = new Tabber('tabs');
-                </script>
-            </body>
-            </html>
+            <!-- Load d3.js and c3.js -->
+            <script src="js/d3.v5.min.js"></script>
+            <script src="js/c3-0.6.5/c3.min.js"></script>
+            <script src="js/leaflet.js"></script>
+            <link rel="stylesheet" href="index.css" type="text/css" />
+            
+            <!-- Data Tables -->
+            <link rel="stylesheet" type="text/css" href="js/datatables/datatables.min.css"/>
+            <script type="text/javascript" src="js/datatables/datatables.min.js"></script>
+        </head>
+        <body>
+            <div id='overlay'></div>
+        
+            <div id='content-wrapper'>
+                <nav id='main-menu'></nav>
+                <div id='main'>
+                    <section data-title='Map'>
+                        <div id='map'></div>
+                    </section>
+                    
+                    <section data-title='Summary'>
+                        <h1>Summary</h1>
+                        <h2>Worst Commutes</h2>
+                        <div id="worst-commutes"></div>
+                        
+                        <!--<h2>Least Drivers</h2>-->
+                    </section>
+                    
+                    <section data-title='Data Table'>
+                        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+                        <script src="data-table.js" type="text/javascript"></script>
+                        <div id="table_div"></div>
+
+                    </section>
+                </div>
+            </div>            
+            
+            <!-- Data Files -->
+            <script src="meta.js" type="text/javascript"></script>
+            <script src="percentiles.js" type="text/javascript"></script>
+            <script src="counties.js" type="text/javascript"></script>
+            <script src="worst-commutes.js" type="text/javascript"></script>
+            
+            <!-- Map -->
+            <script src="helpers.js" type="text/javascript"></script>
+            <script src="index.js" type="text/javascript"></script>
+            <script type='text/javascript'>
+                <!-- Crucial: This needs to load after index.js -->
+                var overlay_tabs = new Tabber('tabs');
+                var map_tabs = new Tabber('main');
+            </script>
+        </body>
+        </html>

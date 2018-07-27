@@ -301,7 +301,14 @@ function moreInfo(e) {
                     props.HC01_EST_VC13, props.HC01_EST_VC14
                 ]
             ],
-            type: 'bar'
+            type: 'bar',
+            groups: [
+                ['Drove to Work (Total)', 'Took Public Transport',
+                'Walked',
+                'Biked',
+                'Cab, Motorcycle, etc.',
+                'Worked at Home']
+            ]
         },
         axis: {
           x: {
