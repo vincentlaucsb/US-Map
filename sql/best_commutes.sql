@@ -1,5 +1,5 @@
 SELECT
-	jsonb_build_object('bindto', '#worst-commutes') ||
+	jsonb_build_object('bindto', '#best-commutes') ||
 	jsonb_build_object('data',
 		jsonb_build_object('columns',
             jsonb_build_array(
@@ -31,5 +31,5 @@ FROM
 (SELECT
 	"GEO.display-label", "HC01_EST_VC55"
 FROM "ACS_16_5YR_S0801_with_ann.csv"
-ORDER BY "HC01_EST_VC55" DESC
+ORDER BY "HC01_EST_VC55" ASC
 LIMIT 20) as subquery

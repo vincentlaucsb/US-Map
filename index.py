@@ -83,6 +83,7 @@ if regen:
         query = load_query('counties_geojson.sql')
         percentiles = load_query('percentiles.sql')
         worst = load_query('worst_commutes.sql')
+        best = load_query('best_commutes.sql')
         
         cur.execute(query)
         counties_data = json.dumps(cur.fetchone()[0])
@@ -93,9 +94,12 @@ if regen:
             cur.execute(percentiles.format(col=col))
             percentiles_json[col] = cur.fetchone()[0]
             
-        # Build worst commutes graph
+        # Build best/worst commutes graph
         cur.execute(worst)
         worst_json = cur.fetchone()[0]
+        
+        cur.execute(best)
+        best_json = cur.fetchone()[0]
             
         with open('counties.js', 'w') as outfile:
             outfile.write('var counties = {};'.format(
@@ -109,75 +113,103 @@ if regen:
             outfile.write('c3.generate({});'.format(
                 json.dumps(worst_json)))
                 
+        with open('best-commutes.js', 'w') as outfile:
+            outfile.write('c3.generate({});'.format(
+                json.dumps(best_json)))
+                
         with open('percentiles.js', 'w') as outfile:
             outfile.write('var percentiles = {};'.format(
                 json.dumps(percentiles_json)))
     
 with open('index.html', 'w') as outfile:
     outfile.write('''
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="UTF-8">
-            <title>US Map</title>
-            <link rel="stylesheet" href="js/leaflet.css" />
-            
-            <!-- Load tabs -->
-            <script src="js/vince.js/tabs/tabs.js" type="text/javascript"></script>
-            
-            <!-- Load c3.css -->
-            <link href="js/c3-0.6.5/c3.css" rel="stylesheet">
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>US Map</title>
+    <link rel="stylesheet" href="js/leaflet.css" />
+    
+    <!-- Load tabs -->
+    <link href="js/vince.js/tabs/tabs.css" rel="stylesheet" type="text/css" />
+    <script src="js/vince.js/tabs/tabs.js" type="text/javascript"></script>
+    
+    <!-- Load c3.css -->
+    <link href="js/c3-0.6.5/c3.css" rel="stylesheet">
 
-            <!-- Load d3.js and c3.js -->
-            <script src="js/d3.v5.min.js"></script>
-            <script src="js/c3-0.6.5/c3.min.js"></script>
-            <script src="js/leaflet.js"></script>
-            <link rel="stylesheet" href="index.css" type="text/css" />
-            
-            <!-- Data Tables -->
-            <link rel="stylesheet" type="text/css" href="js/datatables/datatables.min.css"/>
-            <script type="text/javascript" src="js/datatables/datatables.min.js"></script>
-        </head>
-        <body>
-            <div id='overlay'></div>
-        
-            <div id='content-wrapper'>
-                <nav id='main-menu'></nav>
-                <div id='main'>
-                    <section data-title='Map'>
-                        <div id='map'></div>
-                    </section>
-                    
-                    <section data-title='Summary'>
-                        <h1>Summary</h1>
-                        <h2>Worst Commutes</h2>
-                        <div id="worst-commutes"></div>
-                        
-                        <!--<h2>Least Drivers</h2>-->
-                    </section>
-                    
-                    <section data-title='Data Table'>
-                        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-                        <script src="data-table.js" type="text/javascript"></script>
-                        <div id="table_div"></div>
+    <!-- Load d3.js and c3.js -->
+    <script src="js/d3.v5.min.js"></script>
+    <script src="js/c3-0.6.5/c3.min.js"></script>
+    <script src="js/leaflet.js"></script>
+    <link rel="stylesheet" href="css/index.css" type="text/css" />
+    
+    <!-- Data Tables -->
+    <link rel="stylesheet" type="text/css" href="js/datatables/datatables.min.css"/>
+    <script type="text/javascript" src="js/datatables/datatables.min.js"></script>
+</head>
+<body>
+    <div id='overlay'></div>
 
-                    </section>
-                </div>
-            </div>            
+    <div id='content-wrapper'>
+        <nav id='main-menu'></nav>
+        <div id='main'>
+            <section data-title='Map'>
+                <div id='map'></div>
+            </section>
             
-            <!-- Data Files -->
-            <script src="meta.js" type="text/javascript"></script>
-            <script src="percentiles.js" type="text/javascript"></script>
-            <script src="counties.js" type="text/javascript"></script>
-            <script src="worst-commutes.js" type="text/javascript"></script>
+            <section data-title='Summary'>           
+                <h2>Worst Commutes</h2>
+                <p>A good chunk of the worst commutes belong to counties in the area around our nation's capital.</p>
+                <div id="worst-commutes"></div>
+                
+                <h2>Best Commutes</h2>
+                <p>Tired of waiting in traffic? Consider packing bags and moving to Alaska. On the other hand, maybe waiting in traffic isn't so bad after all.</p>
+                <div id="best-commutes"></div>
+                
+                <!--<h2>Least Drivers</h2>-->
+            </section>
             
-            <!-- Map -->
-            <script src="helpers.js" type="text/javascript"></script>
-            <script src="index.js" type="text/javascript"></script>
-            <script type='text/javascript'>
-                <!-- Crucial: This needs to load after index.js -->
-                var overlay_tabs = new Tabber('tabs');
-                var map_tabs = new Tabber('main');
-            </script>
-        </body>
-        </html>''')
+            <section data-title='Sources'>
+                <p>The following sources were invaluable in producing this visualization:</p>
+                
+                <section>
+                    <h2>US Counties GeoJSON</h2>
+                    <a href="http://eric.clst.org/tech/usgeojson/">
+                        http://eric.clst.org/tech/usgeojson/
+                    </a>
+                    <p>A GeoJSON containing the geographic boundaries of every US county, converted from US Census Bureau shapefiles.</p>
+                </section>
+
+                <section>
+                    <h2>American Community Survey</h2>
+                    <a href="https://factfinder.census.gov">https://factfinder.census.gov</a>
+                    <p>The data on American commuters was provided by Census table S0801 from the 2016 (5-year) American Community Survey.</p>
+                </section>
+
+                <section>
+                    <h2>Source Code</h2>
+                    <a href="https://github.com/vincentlaucsb/US-Map">https://github.com/vincentlaucsb/US-Map</a>
+                    <p>This visualization was built by Vincent La with the help of JavaScript (leaflet.js, c3.js, and custom code), PostgreSQL, and Python.
+                    </p>
+                </section>
+            </section>
+        </div>
+    </div>            
+    
+    <!-- Data Files -->
+    <script src="meta.js" type="text/javascript"></script>
+    <script src="percentiles.js" type="text/javascript"></script>
+    <script src="counties.js" type="text/javascript"></script>
+    <script src="worst-commutes.js" type="text/javascript"></script>
+    <script src="best-commutes.js" type="text/javascript"></script>
+    
+    <!-- Map -->
+    <script src="helpers.js" type="text/javascript"></script>
+    <script src="index.js" type="text/javascript"></script>
+    <script type='text/javascript'>
+        <!-- Crucial: This needs to load after index.js -->
+        var overlay_tabs = new Tabber('tabs');
+        var map_tabs = new Tabber('main');
+    </script>
+</body>
+</html>''')
