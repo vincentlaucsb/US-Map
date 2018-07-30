@@ -31,6 +31,7 @@ class GraphContainer {
     
     generate(params) {
         params.bindto = "#" + this.target + " div.graph";
+        params.axis.x.height = 50;
         c3.generate(params);
     }
 }
@@ -63,7 +64,8 @@ class Overlay {
         
         // create close handler
         var close_handler = document.createElement("a");
-        close_handler.innerHTML = "Close [x]";
+        close_handler.setAttribute("class", "close-handler");
+        close_handler.innerHTML = "Close";
         
         // addEventListener doesn't work for some reason
         close_handler.setAttribute("onclick", "overlay_manager.hide()");

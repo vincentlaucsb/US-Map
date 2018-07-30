@@ -1,2 +1,5 @@
 # My Programs
-.exe
+*.exe
+
+# Cache
+.sass-cache/

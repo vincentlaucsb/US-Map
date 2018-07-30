@@ -101,23 +101,23 @@ if regen:
         cur.execute(best)
         best_json = cur.fetchone()[0]
             
-        with open('counties.js', 'w') as outfile:
+        with open('data/counties.js', 'w') as outfile:
             outfile.write('var counties = {};'.format(
                 counties_data))
                 
-        with open('meta.js', 'w') as outfile:
+        with open('data/meta.js', 'w') as outfile:
             outfile.write('var meta = {};'.format(
                 json.dumps(vars)))
                 
-        with open('worst-commutes.js', 'w') as outfile:
+        with open('data/worst-commutes.js', 'w') as outfile:
             outfile.write('c3.generate({});'.format(
                 json.dumps(worst_json)))
                 
-        with open('best-commutes.js', 'w') as outfile:
+        with open('data/best-commutes.js', 'w') as outfile:
             outfile.write('c3.generate({});'.format(
                 json.dumps(best_json)))
                 
-        with open('percentiles.js', 'w') as outfile:
+        with open('data/percentiles.js', 'w') as outfile:
             outfile.write('var percentiles = {};'.format(
                 json.dumps(percentiles_json)))
     
@@ -197,18 +197,21 @@ with open('index.html', 'w') as outfile:
     </div>            
     
     <!-- Data Files -->
-    <script src="meta.js" type="text/javascript"></script>
-    <script src="percentiles.js" type="text/javascript"></script>
-    <script src="counties.js" type="text/javascript"></script>
-    <script src="worst-commutes.js" type="text/javascript"></script>
-    <script src="best-commutes.js" type="text/javascript"></script>
+    <script src="data/meta.js" type="text/javascript"></script>
+    <script src="data/percentiles.js" type="text/javascript"></script>
+    <script src="data/counties.js" type="text/javascript"></script>
+    <script src="data/worst-commutes.js" type="text/javascript"></script>
+    <script src="data/best-commutes.js" type="text/javascript"></script>
     
     <!-- Map -->
-    <script src="helpers.js" type="text/javascript"></script>
-    <script src="index.js" type="text/javascript"></script>
+    <script src="js/helpers.js" type="text/javascript"></script>
+    <script src="js/index.js" type="text/javascript"></script>
     <script type='text/javascript'>
         <!-- Crucial: This needs to load after index.js -->
-        var overlay_tabs = new Tabber('tabs');
+        var overlay_tabs = new Tabber('tabs', {
+            tabClass: 'overlay-tab',
+            navBarClass: 'overlay-tab-menu'
+        });
         var map_tabs = new Tabber('main');
     </script>
 </body>

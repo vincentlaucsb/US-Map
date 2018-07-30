@@ -73,18 +73,21 @@
     </div>            
     
     <!-- Data Files -->
-    <script src="meta.js" type="text/javascript"></script>
-    <script src="percentiles.js" type="text/javascript"></script>
-    <script src="counties.js" type="text/javascript"></script>
-    <script src="worst-commutes.js" type="text/javascript"></script>
-    <script src="best-commutes.js" type="text/javascript"></script>
+    <script src="data/meta.js" type="text/javascript"></script>
+    <script src="data/percentiles.js" type="text/javascript"></script>
+    <script src="data/counties.js" type="text/javascript"></script>
+    <script src="data/worst-commutes.js" type="text/javascript"></script>
+    <script src="data/best-commutes.js" type="text/javascript"></script>
     
     <!-- Map -->
-    <script src="helpers.js" type="text/javascript"></script>
-    <script src="index.js" type="text/javascript"></script>
+    <script src="js/helpers.js" type="text/javascript"></script>
+    <script src="js/index.js" type="text/javascript"></script>
     <script type='text/javascript'>
         <!-- Crucial: This needs to load after index.js -->
-        var overlay_tabs = new Tabber('tabs');
+        var overlay_tabs = new Tabber('tabs', {
+            tabClass: 'overlay-tab',
+            navBarClass: 'overlay-tab-menu'
+        });
         var map_tabs = new Tabber('main');
     </script>
 </body>
