@@ -154,7 +154,9 @@ with open('index.html', 'w') as outfile:
         <nav id='main-menu'></nav>
         <div id='main'>
             <section data-title='Map'>
-                <div id='map'></div>
+                <div id='map'>
+                    <p id="load">Loading...</p>
+                </div>
             </section>
             
             <section data-title='Summary'>           
@@ -196,6 +198,11 @@ with open('index.html', 'w') as outfile:
         </div>
     </div>            
     
+    <!-- Main Tabs -->
+    <script type='text/javascript'>
+        var map_tabs = new Tabber('main');
+    </script>
+    
     <!-- Data Files -->
     <script src="data/meta.js" type="text/javascript"></script>
     <script src="data/percentiles.js" type="text/javascript"></script>
@@ -212,7 +219,6 @@ with open('index.html', 'w') as outfile:
             tabClass: 'overlay-tab',
             navBarClass: 'overlay-tab-menu'
         });
-        var map_tabs = new Tabber('main');
     </script>
 </body>
 </html>''')

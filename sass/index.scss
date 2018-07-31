@@ -1,3 +1,10 @@
+%centered {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
 body {
     font-family: sans-serif;
     margin: 0;
@@ -61,7 +68,13 @@ body {
     }
 }
 
+#map #load {
+    @extend %centered;
+}
+
 #overlay {
+    @extend %centered;
+
     display: none; /* Unset by #overlay.visible */
     min-width: 60vw;
     max-width: 80vw;
@@ -69,11 +82,7 @@ body {
     text-align: center;
     
     /* Center horizontally and vertically */
-    position: absolute;
     z-index: 999;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
     
     * {
         margin: 0;    
